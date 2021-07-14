@@ -70,19 +70,19 @@
                                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                 <textInputTraits key="textInputTraits"/>
                                                             </textField>
-                                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="enter last name" textAlignment="natural" minimumFontSize="17" background="textField" translatesAutoresizingMaskIntoConstraints="NO" id="FvM-xu-JLx">
+                                                            <textField opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="enter last name" textAlignment="natural" minimumFontSize="17" background="textField" translatesAutoresizingMaskIntoConstraints="NO" id="FvM-xu-JLx">
                                                                 <rect key="frame" x="0.0" y="56" width="194" height="30"/>
                                                                 <nil key="textColor"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                 <textInputTraits key="textInputTraits"/>
                                                             </textField>
-                                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="enter date of birth" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4iK-hc-I38">
+                                                            <textField opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="enter date of birth" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4iK-hc-I38">
                                                                 <rect key="frame" x="0.0" y="112" width="194" height="30"/>
                                                                 <nil key="textColor"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                                 <textInputTraits key="textInputTraits"/>
                                                             </textField>
-                                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="im9-xm-VgM">
+                                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="im9-xm-VgM" userLabel="GenderButtonView">
                                                                 <rect key="frame" x="0.0" y="168" width="194" height="50"/>
                                                                 <subviews>
                                                                     <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ep3-EF-JwA">
@@ -160,7 +160,7 @@
                                                 <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TVJ-DP-gEg">
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" tag="3" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TVJ-DP-gEg">
                                                 <rect key="frame" x="173" y="241" width="193.5" height="56"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
@@ -248,10 +248,18 @@
                     </view>
                     <connections>
                         <outlet property="aboutMe" destination="TVJ-DP-gEg" id="V2J-rf-zbB"/>
+                        <outlet property="btnSave" destination="g7B-JN-Kzu" id="EMm-Nc-ljT"/>
+                        <outlet property="btnSelectImage" destination="ZEE-en-hI6" id="LCs-ho-D3u"/>
                         <outlet property="dobPicker" destination="4iK-hc-I38" id="x5B-cK-zD5"/>
                         <outlet property="fName" destination="lii-WI-beN" id="NYI-pm-spg"/>
                         <outlet property="imageView" destination="n3f-OB-jRa" id="38k-PS-UFt"/>
                         <outlet property="lName" destination="FvM-xu-JLx" id="Ukf-i2-ULh"/>
+                        <outlet property="labelAboutMe" destination="4Ea-67-4kn" id="ji2-tu-Xxs"/>
+                        <outlet property="labelDob" destination="m4u-Gw-iub" id="HCY-iF-Xn9"/>
+                        <outlet property="labelFemale" destination="Fnt-ka-lLj" id="S8s-W5-E9a"/>
+                        <outlet property="labelGender" destination="F3E-6i-i4N" id="n0Z-x1-MEC"/>
+                        <outlet property="labelLastName" destination="CYz-Zw-jG4" id="B0R-ze-g2Y"/>
+                        <outlet property="labelMale" destination="Ivv-gd-ILu" id="2BC-iZ-Nxi"/>
                         <outlet property="save" destination="g7B-JN-Kzu" id="VpJ-vX-X50"/>
                         <outletCollection property="genderButtons" destination="k1j-Fp-9h4" collectionClass="NSMutableArray" id="eV4-P0-qfM"/>
                         <outletCollection property="genderButtons" destination="Ep3-EF-JwA" collectionClass="NSMutableArray" id="BP0-ls-5JQ"/>
@@ -291,7 +299,7 @@
                                                             <action selector="sortName:" destination="Kym-ZC-7ib" eventType="touchUpInside" id="sRU-vv-Egv"/>
                                                         </connections>
                                                     </button>
-                                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="upButton" translatesAutoresizingMaskIntoConstraints="NO" id="gpM-GB-3gh">
+                                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="upButton" highlighted="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gpM-GB-3gh">
                                                         <rect key="frame" x="60" y="0.0" width="30" height="30"/>
                                                         <color key="backgroundColor" red="0.80411796310000005" green="0.86216864150000005" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <constraints>

@@ -65,7 +65,25 @@ class FirstViewController: UIViewController {
     //MARK: - Sorting by age
     @IBOutlet weak var ageButtonImage: UIImageView!
     @IBAction func sortAge(_ sender: UIButton) {
-        
+        do {
+            let request: NSFetchRequest<Items> = Items.fetchRequest()
+            let sort = NSSortDescriptor(key: "dateofbirth", ascending: (flag == 0 ? true : false))
+            request.sortDescriptors = [sort]
+            self.itemArrayFVC  = try context.fetch(request)
+            if flag == 0 {
+                nameButtonImage.image = UIImage(named: "upButton")
+            }
+            else {
+                nameButtonImage.image = UIImage(named: "downButton")
+            }
+            DispatchQueue.main.async {
+                self.dataTableView.reloadData()
+            }
+            flag = (flag == 0 ? 1 : 0)
+        }
+        catch {
+            print("Error while sorting name \(error)")
+        }
     }
     //MARK: - Sorting by gender
     @IBOutlet weak var genderButtonImage: UIImageView!
@@ -199,12 +217,6 @@ extension FirstViewController: UISearchBarDelegate {
         do {
             let results   = try context.fetch(fetchRequest)
             filteredData = results as! [Items]
-//
-//            for item in filteredData {
-//                print(item)
-//                print(filteredData.count)
-//            }
-            
         } catch let error as NSError {
             print("Could not fetch \(error)")
         }
@@ -227,7 +239,6 @@ extension FirstViewController: UISearchBarDelegate {
         }
         dataTableView.reloadData()
         filtered = true
-        //print("\(query)")
     }
 }
 

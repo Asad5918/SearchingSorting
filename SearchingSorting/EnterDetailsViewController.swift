@@ -18,28 +18,58 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     @IBOutlet weak var aboutMe: UITextView!
     @IBOutlet weak var imageView: UIImageView!
     
+    @IBOutlet weak var labelLastName: UILabel!
+    @IBOutlet weak var labelDob: UILabel!
+    @IBOutlet weak var labelGender: UILabel!
+    @IBOutlet weak var labelMale: UILabel!
+    @IBOutlet weak var labelFemale: UILabel!
+    @IBOutlet weak var labelAboutMe: UILabel!
+    
+    @IBOutlet weak var btnSelectImage: UIButton!
+    @IBOutlet weak var btnSave: UIButton!
+    
     var itemArray = [Items]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
+    
     let datePicker = UIDatePicker()
     var gender: String = ""
+    var age:[Int] = []
     override func viewDidLoad() {
+        super.viewDidLoad()
+        
         imageView.layer.cornerRadius = imageView.frame.height/2 // For round imageView
         imageView.layer.masksToBounds = true
-        super.viewDidLoad()
         
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         showDatePicker()
+        
+        self.fName.delegate = self
+        self.lName.delegate = self
+        self.dobPicker.delegate = self
 
+        labelLastName.isHidden = true
+        lName.isHidden = true
+        labelDob.isHidden = true
+        dobPicker.isHidden = true
+        labelGender.isHidden = true
+        genderButtons[0].isHidden = true
+        labelMale.isHidden = true
+        genderButtons[1].isHidden = true
+        labelFemale.isHidden = true
+        labelAboutMe.isHidden = true
+        aboutMe.isHidden = true
+        imageView.isHidden = true
+        btnSelectImage.isHidden = true
+        btnSave.isHidden = true
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
-        
         //loadItems()
     }
     @objc func dismissKeyboard() {
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
+    
     //MARK: - getGender
     @IBAction func selectGender(_ sender: UIButton) {
         for button in genderButtons {
@@ -71,8 +101,8 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
         
         self.present(actionSheet, animated: true, completion: nil)
     }
-   
-    // To select and display image
+    
+    //To select and display image
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         imageView.image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
         self.dismiss(animated: true, completion: nil)  // to dismiss the navigator when the image has been selected.
@@ -98,39 +128,42 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
         formatter.dateFormat = "dd/MM/yyyy"
         dobPicker.text = formatter.string(from: datePicker.date)
         self.view.endEditing(true)
-        print(dobPicker.text!)
+        age = getAgeFromDOB(date: dobPicker.text!)
+        if age[0] < 16 {
+            showAlert("Age should be above 16")
+            dobPicker.text = ""
+        } else {
+            labelGender.isHidden = false
+            genderButtons[0].isHidden = false
+            labelMale.isHidden = false
+            genderButtons[1].isHidden = false
+            labelFemale.isHidden = false
+            labelAboutMe.isHidden = false
+            aboutMe.isHidden = false
+            imageView.isHidden = false
+            btnSelectImage.isHidden = false
+            btnSave.isHidden = false
+        }
+        print(age)
     }
     
     @objc func cancelDatePicker(){
         self.view.endEditing(true)
     }
-  
-//    func getAgeFromDOF(date: String) -> Array<Int> {
-//
-//        let dateFormater = DateFormatter()
-//        dateFormater.dateFormat = "dd/MM/yyyy"
-//        let dateOfBirth = dateFormater.date(from: date)
-//
-//        let calender = Calendar.current
-//
-//        let dateComponent = calender.dateComponents([.year, .month, .day], from:
-//            dateOfBirth!, to: Date())
-//
-//        return [dateComponent.year!, dateComponent.month!, dateComponent.day!]
-//    }
-//
-//    let age  = getAgeFromDOF(date: "01/12/2000")
-//    print(age)
-//    print(age[0])
-//    print(age[1])
-//    print(age[2])
-
+    func getAgeFromDOB(date: String) -> Array<Int> {
+        
+        let dateFormater = DateFormatter()
+        dateFormater.dateFormat = "dd/MM/yyyy"
+        let dateOfBirth = dateFormater.date(from: date)
+        
+        let calender = Calendar.current
+        
+        let dateComponent = calender.dateComponents([.year, .month, .day], from:
+            dateOfBirth!, to: Date())
+        
+        return [dateComponent.year!, dateComponent.month!, dateComponent.day!]
+    }
     
-//    //Calls this function when the tap is recognized.
-//    @objc func dismissKeyboard() {
-//        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-//        view.endEditing(true)
-//    }
     //MARK: - Save button
     @IBOutlet weak var save: UIButton!
     @IBAction func saveClicked(_ sender: UIButton) {
@@ -156,16 +189,15 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
             newItem.gender = gender
             newItem.image = (imageView.image?.pngData())!
             newItem.aboutMe = aboutMe.text!
-            
+            newItem.age = age
             saveItems()
             // for console check
-            print(newItem.fName!)
-            print(newItem.lName!)
-            print(newItem.dateofbirth!)
-            print(newItem.gender!)
-            print(newItem.image!)
-            print(newItem.aboutMe!)
-            
+            //            print(newItem.fName!)
+            //            print(newItem.lName!)
+            //            print(newItem.dateofbirth!)
+            //            print(newItem.gender!)
+            //            print(newItem.image!)
+            //            print(newItem.aboutMe!)
             self.navigationController?.popViewController(animated: true)
         }
     }
@@ -177,7 +209,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
             print("Error saving context \(error)")
         }
     }
-    
+   
     //MARK: - Alert function
     func showAlert(_ titleMessage: String) {
         let alert = UIAlertController(title: titleMessage, message: "", preferredStyle: .alert)
@@ -216,3 +248,27 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
         print("Select image")
     }
 }
+extension EnterDetailsViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if (textField.text?.count)! > 0 {
+            //textField.resignFirstResponder()
+            performAction(textField.tag)
+        }
+        return true
+    }
+    func performAction(_ tag: Int) {
+        switch tag {
+        case 0:
+            labelLastName.isHidden = false
+            lName.isHidden = false
+            lName.becomeFirstResponder()
+        case 1:
+            labelDob.isHidden = false
+            dobPicker.isHidden = false
+            dobPicker.becomeFirstResponder()
+            // all other cases of Unhiding labels and text fields is written inside donedatePicker() function
+        default: break
+        }
+    }
+}
+
