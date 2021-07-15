@@ -34,6 +34,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     let datePicker = UIDatePicker()
     var gender: String = ""
     var age:[Int] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -125,7 +126,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     
     @objc func donedatePicker(){
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.dateFormat = "yyyy/MM/dd"
         dobPicker.text = formatter.string(from: datePicker.date)
         self.view.endEditing(true)
         age = getAgeFromDOB(date: dobPicker.text!)
@@ -153,7 +154,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     func getAgeFromDOB(date: String) -> Array<Int> {
         
         let dateFormater = DateFormatter()
-        dateFormater.dateFormat = "dd/MM/yyyy"
+        dateFormater.dateFormat = "yyyy/MM/dd"
         let dateOfBirth = dateFormater.date(from: date)
         
         let calender = Calendar.current
@@ -191,13 +192,6 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
             newItem.aboutMe = aboutMe.text!
             newItem.age = age
             saveItems()
-            // for console check
-            //            print(newItem.fName!)
-            //            print(newItem.lName!)
-            //            print(newItem.dateofbirth!)
-            //            print(newItem.gender!)
-            //            print(newItem.image!)
-            //            print(newItem.aboutMe!)
             self.navigationController?.popViewController(animated: true)
         }
     }

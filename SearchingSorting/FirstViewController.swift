@@ -27,19 +27,18 @@ class FirstViewController: UIViewController {
         navigationItem.titleView = searchBar
         searchBar.delegate = self
         searchBar.placeholder = "Search"
-        dataTableView.reloadData()
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
     override func viewWillAppear(_ animated: Bool) {
         loadItems()
-        dataTableView.reloadData()
+        //dataTableView.reloadData()
     }
     @objc func dismissKeyboard() {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
-    //MARK: - Sorting by Name
+//MARK: - Sorting by Name
     @IBOutlet weak var nameButtonImage: UIImageView!
     @IBAction func sortName(_ sender: UIButton) {
         do {
@@ -62,7 +61,7 @@ class FirstViewController: UIViewController {
             print("Error while sorting name \(error)")
         }
     }
-    //MARK: - Sorting by age
+//MARK: - Sorting by age
     @IBOutlet weak var ageButtonImage: UIImageView!
     @IBAction func sortAge(_ sender: UIButton) {
         do {
@@ -71,10 +70,10 @@ class FirstViewController: UIViewController {
             request.sortDescriptors = [sort]
             self.itemArrayFVC  = try context.fetch(request)
             if flag == 0 {
-                nameButtonImage.image = UIImage(named: "upButton")
+                ageButtonImage.image = UIImage(named: "upButton")
             }
             else {
-                nameButtonImage.image = UIImage(named: "downButton")
+                ageButtonImage.image = UIImage(named: "downButton")
             }
             DispatchQueue.main.async {
                 self.dataTableView.reloadData()
@@ -85,7 +84,7 @@ class FirstViewController: UIViewController {
             print("Error while sorting name \(error)")
         }
     }
-    //MARK: - Sorting by gender
+//MARK: - Sorting by gender
     @IBOutlet weak var genderButtonImage: UIImageView!
     @IBAction func sortGender(_ sender: UIButton) {
         do {
@@ -108,7 +107,7 @@ class FirstViewController: UIViewController {
             print("Error while sorting gender \(error)")
         }
     }
-    //MARK: - Edit button
+//MARK: - Edit button
     @IBAction func editButtonClicked(_ sender: UIButton) {
         let alert = UIAlertController(title: "Edit", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Editing Done", style: .default) { (action) in
@@ -122,10 +121,7 @@ class FirstViewController: UIViewController {
         alert.addAction(action)
         present(alert,animated: true, completion: nil)
     }
-    
 }
-
-
 //MARK: - TableView methods
 extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
     
@@ -135,7 +131,6 @@ extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
         }
         return filtered ? 0 : itemArrayFVC.count
     }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier, for: indexPath) as! ItemTableViewCell
         let item = itemArrayFVC[indexPath.row]
@@ -157,9 +152,9 @@ extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        return .delete
-    }
+//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+//        return .delete
+//    }
     // For swipe to delete gesture for deleting from database and tableView
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -168,6 +163,14 @@ extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
             saveItems()
             tableView.reloadData()
         }
+    }
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { (_, _, completionHandler) in
+            completionHandler(true)
+        }
+        editAction.backgroundColor = UIColor.lightGray
+        let configuration = UISwipeActionsConfiguration(actions: [editAction])
+        return configuration
     }
     
     // for editing data
@@ -196,22 +199,8 @@ extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
-
 //MARK: - Search bar methods
 extension FirstViewController: UISearchBarDelegate {
-//    func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText string: String) -> Bool {
-//
-//    }
-    
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        let request: NSFetchRequest<Items> = Items.fetchRequest()
-//        request.predicate = NSPredicate(format: "(fName CONTAINS[cd] %@) OR (lName CONTAINS[cd] %@)" , searchBar.text!, searchBar.text!) //[cd] is for making the search query case and diacritic insensitive.
-//        request.sortDescriptors = [NSSortDescriptor(key: "fName", ascending: true)]
-//        loadItems(with: request)
-//        print(searchBar.text!)
-//        //searchBar.text = ""
-//    }
-    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         do {
@@ -226,7 +215,7 @@ extension FirstViewController: UISearchBarDelegate {
         if searchBar.text?.count == 0 {
             loadItems()
             DispatchQueue.main.async {
-                searchBar.resignFirstResponder() // To go back to original tableView
+                searchBar.resignFirstResponder()
             }
         }
     }
@@ -241,5 +230,3 @@ extension FirstViewController: UISearchBarDelegate {
         filtered = true
     }
 }
-
-
