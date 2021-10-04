@@ -34,10 +34,10 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     let datePicker = UIDatePicker()
     var gender: String = ""
     var age:[Int] = []
-    
+    static var saveFlag: Bool = false
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("V2 viewDidLoad called")
         imageView.layer.cornerRadius = imageView.frame.height/2 // For round imageView
         imageView.layer.masksToBounds = true
         
@@ -66,6 +66,24 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
         //loadItems()
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        EnterDetailsViewController.saveFlag = false
+        print("V2 viewWillAppear called")
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("V2 viewDidAppear called")
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        print("V2 viewWillDisappear called")
+        print(EnterDetailsViewController.saveFlag)
+    }
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        print("V2 viewDidDisappear called")
     }
     @objc func dismissKeyboard() {
         view.endEditing(true)
@@ -191,6 +209,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
             newItem.image = (imageView.image?.pngData())!
             newItem.aboutMe = aboutMe.text!
             newItem.age = age
+            EnterDetailsViewController.saveFlag = true
             saveItems()
             self.navigationController?.popViewController(animated: true)
         }

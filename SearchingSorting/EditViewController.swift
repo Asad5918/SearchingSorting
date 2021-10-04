@@ -38,19 +38,10 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
     var age:[Int] = []
     var objFVC = FirstViewController()
     var editedIndexPath: IndexPath? = nil
-//    var detailItems: AnyObject? {
-//        didSet {
-//            self.configureView()
-//        }
-//    }
-//    func configureView() {
-//        if let fName = self.fName {
-//            print(fName)
-//        }
-//    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("editVC viewDidLoad")
         imageView.layer.cornerRadius = imageView.frame.height/2 // For round imageView
         imageView.layer.masksToBounds = true
         showDatePicker()
@@ -58,21 +49,6 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         self.fName.delegate = self
         self.lName.delegate = self
         self.dobPicker.delegate = self
-        
-//        labelLastName.isHidden = true
-//        lName.isHidden = true
-//        labelDob.isHidden = true
-//        dobPicker.isHidden = true
-//        labelGender.isHidden = true
-//        genderButtons[0].isHidden = true
-//        labelMale.isHidden = true
-//        genderButtons[1].isHidden = true
-//        labelFemale.isHidden = true
-//        labelAboutMe.isHidden = true
-//        aboutMe.isHidden = true
-//        imageView.isHidden = true
-//        btnSelectImage.isHidden = true
-//        btnSave.isHidden = true
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
@@ -193,52 +169,11 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
             showAlert("Choose gender")
         }
         else {
-            
-        
-//            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Items")
-//
-////            fetchRequest.predicate = NSPredicate(format: "fName = %@ AND lName = %&",  fName.text!, lName.text!)
-//
-//            do {
-//                let newItem = Items(context: context)
-//                let results = try context.fetch(fetchRequest) as? [NSManagedObject]
-//                newItem.setValue("ChangedName", forKey: "fname")
-//                newItem.setValue("lName", forKey: "lName")
-//            } catch {
-//                print("Fetch Failed: \(error)")
-//            }
 
-            //save.isEnabled = !text.isEmpty
-//            objFVC.dataTableView.beginUpdates()
-//            objFVC.dataTableView.insertRows(at: [objFVC.editRowIndexPath], with: .automatic)
-            
-//            let newItem = Items(context: context)
-//            newItem.fName = fName.text!
-//            newItem.lName = lName.text!
-//            newItem.dateofbirth = dobPicker.text!
-//            newItem.gender = gender
-//            newItem.image = (imageView.image?.pngData())!
-//            newItem.aboutMe = aboutMe.text!
-//            newItem.age = age
             saveItems()
-            
-//            objFVC.dataTableView.endUpdates()
-//
-            //self.navigationController?.popViewController(animated: true)
-            performSegue(withIdentifier: "unwindTofirstVC", sender: self)
+            dismiss(animated: true, completion: nil)
+ 
         }
-    }
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        //let edit = segue.destination as? FirstViewController
-//        if segue.identifier == "EditToView" {
-//            let fvc = segue.destination as? FirstViewController
-//
-//            //let rowToEdit = objFVC.itemArrayFVC[(objFVC.editRowIndexPath?.row)!]
-////            rowToEdit.fName = fName.text
-////            rowToEdit.lName = lName.text
-//            print("edit to view")
-//        }
-        
     }
     //MARK: - Save items function
     func saveItems() {
