@@ -667,36 +667,39 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Iq-Ym-gj8">
                                 <rect key="frame" x="0.0" y="64" width="375" height="52"/>
                                 <subviews>
-                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="80" translatesAutoresizingMaskIntoConstraints="NO" id="D8y-OO-Kgg">
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="D8y-OO-Kgg">
                                         <rect key="frame" x="10" y="10" width="355" height="32"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Vd-9G-oal">
-                                                <rect key="frame" x="0.0" y="0.0" width="65" height="32"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="98.5" height="32"/>
                                                 <color key="backgroundColor" red="0.50665974420000004" green="0.55248148470000003" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="15"/>
-                                                <state key="normal" title="fName">
+                                                <state key="normal" title="Name ↓">
                                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </state>
+                                                <state key="selected" title="name z-a"/>
                                                 <connections>
                                                     <action selector="sorting:" destination="Kym-ZC-7ib" eventType="touchUpInside" id="QDc-Ef-1jW"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lmF-NE-qUH">
-                                                <rect key="frame" x="145" y="0.0" width="65" height="32"/>
+                                                <rect key="frame" x="128.5" y="0.0" width="98" height="32"/>
                                                 <color key="backgroundColor" red="0.50665974420000004" green="0.55248148470000003" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                <state key="normal" title="age">
+                                                <state key="normal" title="Age ↓">
                                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </state>
+                                                <state key="selected" title="age 1-0"/>
                                                 <connections>
                                                     <action selector="sorting:" destination="Kym-ZC-7ib" eventType="touchUpInside" id="bTO-8i-ZEt"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="adI-2w-238">
-                                                <rect key="frame" x="290" y="0.0" width="65" height="32"/>
+                                                <rect key="frame" x="256.5" y="0.0" width="98.5" height="32"/>
                                                 <color key="backgroundColor" red="0.50665974420000004" green="0.55248148470000003" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                <state key="normal" title="gender">
+                                                <state key="normal" title="Gender ↓">
                                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </state>
+                                                <state key="selected" title="gender 🙎🏼‍♀️🙎🏼‍♂️"/>
                                                 <connections>
                                                     <action selector="sorting:" destination="Kym-ZC-7ib" eventType="touchUpInside" id="224-qr-K7X"/>
                                                 </connections>
@@ -736,6 +739,9 @@
                     </navigationItem>
                     <connections>
                         <outlet property="dataTableView" destination="wbs-dJ-vT0" id="Hdx-bm-LWz"/>
+                        <outletCollection property="sortingButtons" destination="6Vd-9G-oal" collectionClass="NSMutableArray" id="AcP-wR-ra5"/>
+                        <outletCollection property="sortingButtons" destination="lmF-NE-qUH" collectionClass="NSMutableArray" id="WPn-Jc-MeO"/>
+                        <outletCollection property="sortingButtons" destination="adI-2w-238" collectionClass="NSMutableArray" id="khb-Mz-T4f"/>
                         <segue destination="zxe-y9-cXa" kind="show" identifier="toEditScreen" id="K0X-SJ-hFG"/>
                     </connections>
                 </viewController>

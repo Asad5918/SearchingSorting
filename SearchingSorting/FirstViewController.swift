@@ -10,16 +10,20 @@ import UIKit
 import CoreData
 class FirstViewController: UIViewController {
     @IBOutlet weak var dataTableView: UITableView!
+    @IBOutlet var sortingButtons: [UIButton]!
     var data: NSManagedObject? = nil
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     lazy var searchBar: UISearchBar = UISearchBar()
     var allData = [Items]()
     var filteredData = [Items]()
+    var sortButtonNames = ["Name", "Age", "Gender"]
+    var SortBy = 0
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Items")
     override func viewDidLoad() {
         super.viewDidLoad()
         print("V1 viewDidLoad called")
         loadItems()
+        sortingButtons[0].titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         navigationItem.titleView = searchBar
         searchBar.delegate = self
         searchBar.placeholder = "Search"
@@ -27,10 +31,18 @@ class FirstViewController: UIViewController {
         view.addGestureRecognizer(tap)
         dataTableView.refreshControl = UIRefreshControl()
         dataTableView.refreshControl?.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
+        
     }
     @objc private func didPullToRefresh() {
         print("Pull to refresh")
         loadItems()
+        // for making all buttons to default state after PullToRefresh
+        for button in sortingButtons {
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+            button.accessibilityLabel = ""
+            button.setTitle(sortButtonNames[button.tag].appending(" ↓"), for: .normal)
+        }
+        sortingButtons[0].accessibilityLabel = "UP"
         DispatchQueue.main.async {
             self.dataTableView.refreshControl?.endRefreshing()
         }
@@ -38,8 +50,23 @@ class FirstViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         print("V1 viewWillAppear called")
-        if EnterDetailsViewController.saveFlag {
-            loadItems()
+        if EnterDetailsViewController.hasDataEntered {
+            do {
+                allData = try context.fetch(Items.fetchRequest())
+                filteredData = allData.sorted(by: {$1.name!.lowercased() > $0.name!.lowercased()})
+                for button in sortingButtons {
+                    button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+                    button.accessibilityLabel = ""
+                    button.setTitle(sortButtonNames[button.tag].appending(" ↓"), for: .normal)
+                }
+                sortingButtons[0].titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
+                sortingButtons[0].accessibilityLabel = "UP"
+            } catch {
+                print("Error fetching data from context \(error)")
+            }
+            dataTableView.reloadData()
+        } else {
+            filteredData = allData.sorted(by: {$1.name!.lowercased() > $0.name!.lowercased()}) //for displaying sorted name in beginning
         }
     }
     override func viewDidAppear(_ animated: Bool) {
@@ -59,17 +86,49 @@ class FirstViewController: UIViewController {
     }
     
     @IBAction func sorting(_ sender: UIButton) {
-        switch sender.tag {
+        if SortBy == sender.tag {
+            updateSortButtons(tag: SortBy, isUp: sender.accessibilityLabel == "UP" ? false : true)
+            print(sender.accessibilityLabel!)
+            print("SortBy \(SortBy)")
+        } else {
+            SortBy =  sender.tag
+            print("SortBy \(SortBy)")
+            updateSortButtons(tag: SortBy, isUp: false)
+        }
+    }
+    
+    func updateSortButtons(tag: Int, isUp: Bool) {
+        var sortUp = false
+        for button in sortingButtons {
+            print(button.tag)
+            button.titleLabel?.font = button.tag == SortBy ? UIFont.boldSystemFont(ofSize: 20) : UIFont.systemFont(ofSize: 15)
+    
+            if isUp == true && button.tag == SortBy {
+                button.accessibilityLabel = "UP"
+                button.setTitle(sortButtonNames[button.tag].appending(" ↑"), for: .normal)
+                if sortUp != true {
+                    sortUp = true
+                }
+            } else {
+                button.accessibilityLabel = ""
+                button.setTitle(sortButtonNames[button.tag].appending(" ↓"), for: .normal)
+            }
+        }
+        updateSort(tag: tag, isUp: sortUp)
+    }
+    
+    func updateSort(tag: Int, isUp: Bool) {
+        switch tag {
         case 0:
-            filteredData = allData.sorted(by: { $1.fName! > $0.fName!})
+            filteredData = isUp == true ? allData.sorted(by: { $1.name!.lowercased() < $0.name!.lowercased()}) : allData.sorted(by: { $1.name!.lowercased() > $0.name!.lowercased()})
         case 1:
-            filteredData = allData.sorted(by: { $1.age![0] > $0.age![0]  })
+            filteredData = isUp == true ? allData.sorted(by: { $1.age![0] < $0.age![0] }) : allData.sorted(by: { $1.age![0] > $0.age![0] })
         case 2:
-            filteredData = allData.sorted(by: { $1.gender! < $0.gender!})
+            filteredData = isUp == true ? allData.sorted(by: { $1.gender! > $0.gender!}) : allData.sorted(by: { $1.gender! < $0.gender!})
         default:
             print("Error in sorting")
         }
-        dataTableView.reloadData()
+        self.dataTableView.reloadData()
     }
 }
 //MARK: - TableView methods
@@ -131,10 +190,19 @@ extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
 extension FirstViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if let searchText = searchBar.text {
-            filteredData = allData.filter{($0.fName!).contains(searchText) || ($0.lName!).contains(searchText)}
+            filteredData = allData.filter{($0.name!.lowercased()).starts(with: searchText.lowercased())}
+            filteredData = filteredData.sorted(by: {$1.name!.lowercased() > $0.name!.lowercased()}) // Ascending search result
         }
         if searchText.count == 0 {
-            filteredData = allData
+            // for making all buttons to default state if searchField is empty
+            for button in sortingButtons {
+                button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+                button.accessibilityLabel = ""
+                button.setTitle(sortButtonNames[button.tag].appending(" ↓"), for: .normal)
+            }
+            sortingButtons[0].accessibilityLabel = "UP"
+            
+            filteredData = allData //For showing original data
             DispatchQueue.main.async {
                 searchBar.resignFirstResponder()
             }
@@ -142,4 +210,3 @@ extension FirstViewController: UISearchBarDelegate {
         dataTableView.reloadData()
     }
 }
-

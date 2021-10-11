@@ -34,7 +34,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     let datePicker = UIDatePicker()
     var gender: String = ""
     var age:[Int] = []
-    static var saveFlag: Bool = false
+    static var hasDataEntered: Bool = false
     override func viewDidLoad() {
         super.viewDidLoad()
         print("V2 viewDidLoad called")
@@ -69,7 +69,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        EnterDetailsViewController.saveFlag = false
+        EnterDetailsViewController.hasDataEntered = false
         print("V2 viewWillAppear called")
     }
     override func viewDidAppear(_ animated: Bool) {
@@ -79,7 +79,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         print("V2 viewWillDisappear called")
-        print(EnterDetailsViewController.saveFlag)
+        print(EnterDetailsViewController.hasDataEntered)
     }
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -209,7 +209,8 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
             newItem.image = (imageView.image?.pngData())!
             newItem.aboutMe = aboutMe.text!
             newItem.age = age
-            EnterDetailsViewController.saveFlag = true
+            newItem.name = fName.text! + " " + lName.text!
+            EnterDetailsViewController.hasDataEntered = true
             saveItems()
             self.navigationController?.popViewController(animated: true)
         }

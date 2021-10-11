@@ -8,8 +8,9 @@
         <attribute name="gender" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image" attributeType="Binary" syncable="YES"/>
         <attribute name="lName" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Items" positionX="-45" positionY="0" width="128" height="150"/>
+        <element name="Items" positionX="-45" positionY="0" width="128" height="165"/>
     </elements>
 </model>
