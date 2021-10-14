@@ -260,7 +260,6 @@
                         <outlet property="labelGender" destination="F3E-6i-i4N" id="n0Z-x1-MEC"/>
                         <outlet property="labelLastName" destination="CYz-Zw-jG4" id="B0R-ze-g2Y"/>
                         <outlet property="labelMale" destination="Ivv-gd-ILu" id="2BC-iZ-Nxi"/>
-                        <outlet property="save" destination="g7B-JN-Kzu" id="VpJ-vX-X50"/>
                         <outletCollection property="genderButtons" destination="k1j-Fp-9h4" collectionClass="NSMutableArray" id="eV4-P0-qfM"/>
                         <outletCollection property="genderButtons" destination="Ep3-EF-JwA" collectionClass="NSMutableArray" id="BP0-ls-5JQ"/>
                     </connections>
@@ -515,7 +514,6 @@
                         <outlet property="labelGender" destination="Tgx-13-VX2" id="CRp-2t-nwl"/>
                         <outlet property="labelLastName" destination="S6V-PA-NvT" id="dge-2u-w9e"/>
                         <outlet property="labelMale" destination="1a7-fP-mvQ" id="He0-4A-HE7"/>
-                        <outlet property="save" destination="SwA-OR-XuP" id="NBx-Gb-Ne5"/>
                         <outletCollection property="genderButtons" destination="A0z-C6-2Mx" collectionClass="NSMutableArray" id="Icx-Lz-YgA"/>
                         <outletCollection property="genderButtons" destination="wOh-lH-BMy" collectionClass="NSMutableArray" id="0Nb-r7-RiI"/>
                         <segue destination="SwR-CB-kX1" kind="unwind" identifier="unwindTofirstVC" unwindAction="unwindTofirstVCWithSegue:" id="RxC-EI-NLO"/>
@@ -524,7 +522,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jFe-3O-dkL" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="SwR-CB-kX1" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2233" y="336"/>
+            <point key="canvasLocation" x="2233" y="406"/>
         </scene>
         <!--First View Controller-->
         <scene sceneID="Ley-9d-81A">

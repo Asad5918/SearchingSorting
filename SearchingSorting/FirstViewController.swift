@@ -8,7 +8,7 @@
 
 import UIKit
 import CoreData
-class FirstViewController: UIViewController {
+class FirstViewController: UIViewController, passDataBack{
     @IBOutlet weak var dataTableView: UITableView!
     @IBOutlet var sortingButtons: [UIButton]!
     var data: NSManagedObject? = nil
@@ -16,8 +16,14 @@ class FirstViewController: UIViewController {
     lazy var searchBar: UISearchBar = UISearchBar()
     var allData = [Items]()
     var filteredData = [Items]()
+    var strSearch = ""
     var sortButtonNames = ["Name", "Age", "Gender"]
     var SortBy = 0
+    var sortUp = false
+    
+    var selectedRowData = [Items]()  // for editing
+    var selectedRowNumber = 0        // for editing
+    
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Items")
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,14 +41,13 @@ class FirstViewController: UIViewController {
     }
     @objc private func didPullToRefresh() {
         print("Pull to refresh")
-        loadItems()
-        // for making all buttons to default state after PullToRefresh
-        for button in sortingButtons {
-            button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-            button.accessibilityLabel = ""
-            button.setTitle(sortButtonNames[button.tag].appending(" ↓"), for: .normal)
+        do {
+            allData = try context.fetch(Items.fetchRequest())
+            filteredData = applySearchAndSort(tag: SortBy, isUp: sortUp)
+        } catch {
+            print("Error fetching data from context \(error)")
         }
-        sortingButtons[0].accessibilityLabel = "UP"
+        dataTableView.reloadData()
         DispatchQueue.main.async {
             self.dataTableView.refreshControl?.endRefreshing()
         }
@@ -54,6 +59,7 @@ class FirstViewController: UIViewController {
             do {
                 allData = try context.fetch(Items.fetchRequest())
                 filteredData = allData.sorted(by: {$1.name!.lowercased() > $0.name!.lowercased()})
+                searchBar.text = ""
                 for button in sortingButtons {
                     button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
                     button.accessibilityLabel = ""
@@ -98,7 +104,7 @@ class FirstViewController: UIViewController {
     }
     
     func updateSortButtons(tag: Int, isUp: Bool) {
-        var sortUp = false
+        sortUp = false
         for button in sortingButtons {
             print(button.tag)
             button.titleLabel?.font = button.tag == SortBy ? UIFont.boldSystemFont(ofSize: 20) : UIFont.systemFont(ofSize: 15)
@@ -114,21 +120,8 @@ class FirstViewController: UIViewController {
                 button.setTitle(sortButtonNames[button.tag].appending(" ↓"), for: .normal)
             }
         }
-        updateSort(tag: tag, isUp: sortUp)
-    }
-    
-    func updateSort(tag: Int, isUp: Bool) {
-        switch tag {
-        case 0:
-            filteredData = isUp == true ? allData.sorted(by: { $1.name!.lowercased() < $0.name!.lowercased()}) : allData.sorted(by: { $1.name!.lowercased() > $0.name!.lowercased()})
-        case 1:
-            filteredData = isUp == true ? allData.sorted(by: { $1.age![0] < $0.age![0] }) : allData.sorted(by: { $1.age![0] > $0.age![0] })
-        case 2:
-            filteredData = isUp == true ? allData.sorted(by: { $1.gender! > $0.gender!}) : allData.sorted(by: { $1.gender! < $0.gender!})
-        default:
-            print("Error in sorting")
-        }
-        self.dataTableView.reloadData()
+        filteredData = applySearchAndSort(tag: SortBy, isUp: sortUp)
+        dataTableView.reloadData()
     }
 }
 //MARK: - TableView methods
@@ -157,26 +150,45 @@ extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let editAction = UIContextualAction(style: .normal, title: "EDIT") { (action, sourceView, completionHandler) in
-            print("Edit clicked")
-            let vc = self.storyboard?.instantiateViewController(withIdentifier: "edit") as! EditViewController
-            //vc.fName.text = "Asad"
-            self.present(vc, animated: true)
+        let editAction = UIContextualAction(style: .normal, title: "EDIT")
+        {
+            (action, sourceView, completionHandler) in
+            self.selectedRowData = [self.filteredData[indexPath.row]]
+            self.selectedRowNumber = indexPath.row
+            self.performSegue(withIdentifier: "toEditScreen", sender: self)
             completionHandler(true)
         }
         let configuration = UISwipeActionsConfiguration(actions: [editAction])
         return configuration
     }
-    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toEditScreen" {
+            let destination: EditViewController = segue.destination as! EditViewController
+            destination.delegate = self
+            destination.dataPass = selectedRowData
+        }
+    }
+    func updateRowData(updatedData: [Items]) {
+        filteredData[selectedRowNumber].fName = updatedData[0].fName
+        filteredData[selectedRowNumber].lName = updatedData[0].lName
+        filteredData[selectedRowNumber].dateofbirth = updatedData[0].dateofbirth
+        filteredData[selectedRowNumber].gender = updatedData[0].gender
+        filteredData[selectedRowNumber].image = updatedData[0].image
+        filteredData[selectedRowNumber].aboutMe = updatedData[0].aboutMe
+        filteredData[selectedRowNumber].age = updatedData[0].age
+        filteredData[selectedRowNumber].name = updatedData[0].name
+        dataTableView.reloadData()
+    }
+
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            print("Delete clicked")
-            context.delete(allData[indexPath.row])
+            context.delete(filteredData[indexPath.row])
             filteredData.remove(at: indexPath.row)
+            allData = filteredData
             do {
                 try context.save()
             } catch {
@@ -190,23 +202,29 @@ extension FirstViewController: UITableViewDelegate, UITableViewDataSource {
 extension FirstViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if let searchText = searchBar.text {
-            filteredData = allData.filter{($0.name!.lowercased()).starts(with: searchText.lowercased())}
-            filteredData = filteredData.sorted(by: {$1.name!.lowercased() > $0.name!.lowercased()}) // Ascending search result
+            strSearch = searchText
+            filteredData = applySearchAndSort(tag: SortBy, isUp: sortUp)
         }
         if searchText.count == 0 {
-            // for making all buttons to default state if searchField is empty
-            for button in sortingButtons {
-                button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-                button.accessibilityLabel = ""
-                button.setTitle(sortButtonNames[button.tag].appending(" ↓"), for: .normal)
-            }
-            sortingButtons[0].accessibilityLabel = "UP"
-            
-            filteredData = allData //For showing original data
             DispatchQueue.main.async {
                 searchBar.resignFirstResponder()
             }
         }
         dataTableView.reloadData()
+    }
+    func applySearchAndSort(tag:Int, isUp:Bool ) -> Array<Items> {
+        let tempData = allData.filter{($0.name!.lowercased()).starts(with: strSearch.lowercased())}
+        var sortedArray = [Items]()
+        switch tag {
+        case 0:
+            sortedArray = isUp == true ? tempData.sorted(by: { $1.name!.lowercased() < $0.name!.lowercased()}) : tempData.sorted(by: { $1.name!.lowercased() > $0.name!.lowercased()})
+        case 1:
+            sortedArray = isUp == true ? tempData.sorted(by: { $1.age![0] < $0.age![0] }) : tempData.sorted(by: { $1.age![0] > $0.age![0] })
+        case 2:
+            sortedArray = isUp == true ? tempData.sorted(by: { $1.gender! > $0.gender!}) : tempData.sorted(by: { $1.gender! < $0.gender!})
+        default:
+            print("Error in sorting")
+        }
+        return sortedArray
     }
 }

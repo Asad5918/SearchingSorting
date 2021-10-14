@@ -9,9 +9,12 @@
 import UIKit
 import CoreData
 
+protocol passDataBack {
+    func updateRowData(updatedData: [Items])
+}
+
 class EditViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate  {
     
-
     @IBOutlet weak var fName: UITextField!
     @IBOutlet weak var lName: UITextField!
     @IBOutlet weak var dobPicker: UITextField!
@@ -28,16 +31,14 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
     
     @IBOutlet weak var btnSelectImage: UIButton!
     @IBOutlet weak var btnSave: UIButton!
-    //var objFVC = FirstViewController()
     
-    var itemArray = [Items]()
+    var dataPass = [Items]()        //for storing selectedRowData from FirstVC
+    var delegate: passDataBack!
+
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     let datePicker = UIDatePicker()
     var gender: String = ""
-    var age:[Int] = []
-    var objFVC = FirstViewController()
-    var editedIndexPath: IndexPath? = nil
+    var age:[Int]? = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,14 +46,26 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         imageView.layer.cornerRadius = imageView.frame.height/2 // For round imageView
         imageView.layer.masksToBounds = true
         showDatePicker()
-        
         self.fName.delegate = self
         self.lName.delegate = self
         self.dobPicker.delegate = self
         
+        fName.text = dataPass[0].fName
+        lName.text = dataPass[0].lName
+        dobPicker.text = dataPass[0].dateofbirth
+        age = dataPass[0].age
+        aboutMe.text = dataPass[0].aboutMe
+        gender = dataPass[0].gender!
+        if gender == "Male" {
+            genderButtons[1].isSelected = true
+        }
+        else {
+            genderButtons[0].isSelected = true
+        }
+        imageView.image = UIImage(data: dataPass[0].image!)
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
-        //loadItems()
     }
     @objc func dismissKeyboard() {
         view.endEditing(true)
@@ -117,7 +130,7 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         dobPicker.text = formatter.string(from: datePicker.date)
         self.view.endEditing(true)
         age = getAgeFromDOB(date: dobPicker.text!)
-        if age[0] < 16 {
+        if age![0] < 16 {
             showAlert("Age should be above 16")
             dobPicker.text = ""
         } else {
@@ -132,30 +145,24 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
             btnSelectImage.isHidden = false
             btnSave.isHidden = false
         }
-        print(age)
+        print(age!)
     }
     
     @objc func cancelDatePicker(){
         self.view.endEditing(true)
     }
     func getAgeFromDOB(date: String) -> Array<Int> {
-        
         let dateFormater = DateFormatter()
         dateFormater.dateFormat = "yyyy/MM/dd"
         let dateOfBirth = dateFormater.date(from: date)
-        
         let calender = Calendar.current
-        
         let dateComponent = calender.dateComponents([.year, .month, .day], from:
             dateOfBirth!, to: Date())
-        
         return [dateComponent.year!, dateComponent.month!, dateComponent.day!]
     }
     
     //MARK: - Save button
-    @IBOutlet weak var save: UIButton!
     @IBAction func saveClicked(_ sender: UIButton) {
-        //let text = fName.text ?? ""
         if (fName.text?.isEmpty)! {
             showAlert("Enter first name")
         }
@@ -169,12 +176,22 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
             showAlert("Choose gender")
         }
         else {
-
+            var updatedData = [Items]()
+            updatedData = dataPass
+            updatedData[0].fName = fName.text
+            updatedData[0].lName = lName.text
+            updatedData[0].dateofbirth = dobPicker.text
+            updatedData[0].gender = gender
+            updatedData[0].image = imageView.image?.pngData()
+            updatedData[0].aboutMe = aboutMe.text
+            updatedData[0].age = age
+            updatedData[0].name = fName.text! + " " + lName.text!
+            delegate.updateRowData(updatedData: updatedData)
             saveItems()
-            dismiss(animated: true, completion: nil)
- 
+            self.navigationController?.popViewController(animated: true)
         }
     }
+    
     //MARK: - Save items function
     func saveItems() {
         do {
@@ -221,16 +238,8 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         self.present(imageController, animated: true, completion: nil)
         print("Select image")
     }
-    
 }
 extension EditViewController: UITextFieldDelegate {
-    //    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    //        if (textField.text?.count)! > 0 {
-    //            //textField.resignFirstResponder()
-    //            performAction(textField.tag)
-    //        }
-    //        return true
-    //    }
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         performAction(textField.tag)
         return true

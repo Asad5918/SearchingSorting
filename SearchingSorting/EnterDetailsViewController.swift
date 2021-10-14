@@ -65,7 +65,6 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
-        //loadItems()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -184,9 +183,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     }
     
     //MARK: - Save button
-    @IBOutlet weak var save: UIButton!
     @IBAction func saveClicked(_ sender: UIButton) {
-        //let text = fName.text ?? ""
         if (fName.text?.isEmpty)! {
             showAlert("Enter first name")
         }
@@ -200,7 +197,6 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
             showAlert("Choose gender")
         }
         else {
-            //save.isEnabled = !text.isEmpty
             let newItem = Items(context: context)
             newItem.fName = fName.text!
             newItem.lName = lName.text!
@@ -263,13 +259,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
     }
 }
 extension EnterDetailsViewController: UITextFieldDelegate {
-//    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-//        if (textField.text?.count)! > 0 {
-//            //textField.resignFirstResponder()
-//            performAction(textField.tag)
-//        }
-//        return true
-//    }
+    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         performAction(textField.tag)
         return true
