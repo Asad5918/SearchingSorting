@@ -103,7 +103,7 @@ class EnterDetailsViewController: UIViewController, UINavigationControllerDelega
         
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
-        present(imagePickerController, animated: true, completion: nil)
+        //present(imagePickerController, animated: true, completion: nil)
         
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         

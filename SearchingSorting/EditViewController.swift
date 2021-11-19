@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 protocol passDataBack {
-    func updateRowData(updatedData: [Items])
+    func updateRowData(updatedData: Items)
 }
 
 class EditViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate  {
@@ -32,13 +32,15 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
     @IBOutlet weak var btnSelectImage: UIButton!
     @IBOutlet weak var btnSave: UIButton!
     
-    var dataPass = [Items]()        //for storing selectedRowData from FirstVC
+    var dataPass = Items()        //for storing selectedRowData from FirstVC
     var delegate: passDataBack!
 
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     let datePicker = UIDatePicker()
     var gender: String = ""
     var age:[Int]? = []
+    
+    static var hasDataEntered: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,22 +52,25 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         self.lName.delegate = self
         self.dobPicker.delegate = self
         
-        fName.text = dataPass[0].fName
-        lName.text = dataPass[0].lName
-        dobPicker.text = dataPass[0].dateofbirth
-        age = dataPass[0].age
-        aboutMe.text = dataPass[0].aboutMe
-        gender = dataPass[0].gender!
+        fName.text = dataPass.fName
+        lName.text = dataPass.lName
+        dobPicker.text = dataPass.dateofbirth
+        age = dataPass.age
+        aboutMe.text = dataPass.aboutMe
+        gender = dataPass.gender!
         if gender == "Male" {
             genderButtons[1].isSelected = true
         }
         else {
             genderButtons[0].isSelected = true
         }
-        imageView.image = UIImage(data: dataPass[0].image!)
+        imageView.image = UIImage(data: dataPass.image!)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        EditViewController.hasDataEntered = false
     }
     @objc func dismissKeyboard() {
         view.endEditing(true)
@@ -78,6 +83,7 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         }
         sender.isSelected = true
         gender = sender.currentTitle!
+        dataPass.gender = gender  // for editing
         print(gender)
     }
     
@@ -107,6 +113,8 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         imageView.image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
         self.dismiss(animated: true, completion: nil)  // to dismiss the navigator when the image has been selected.
+        
+        dataPass.image = imageView.image?.pngData()  // for updating image (edit)
     }
     
     //MARK: - Date
@@ -133,17 +141,6 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         if age![0] < 16 {
             showAlert("Age should be above 16")
             dobPicker.text = ""
-        } else {
-            labelGender.isHidden = false
-            genderButtons[0].isHidden = false
-            labelMale.isHidden = false
-            genderButtons[1].isHidden = false
-            labelFemale.isHidden = false
-            labelAboutMe.isHidden = false
-            aboutMe.isHidden = false
-            imageView.isHidden = false
-            btnSelectImage.isHidden = false
-            btnSave.isHidden = false
         }
         print(age!)
     }
@@ -176,18 +173,18 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
             showAlert("Choose gender")
         }
         else {
-            var updatedData = [Items]()
-            updatedData = dataPass
-            updatedData[0].fName = fName.text
-            updatedData[0].lName = lName.text
-            updatedData[0].dateofbirth = dobPicker.text
-            updatedData[0].gender = gender
-            updatedData[0].image = imageView.image?.pngData()
-            updatedData[0].aboutMe = aboutMe.text
-            updatedData[0].age = age
-            updatedData[0].name = fName.text! + " " + lName.text!
-            delegate.updateRowData(updatedData: updatedData)
+//            dataPass[0].fName = fName.text
+//            dataPass[0].lName = lName.text
+//            dataPass[0].dateofbirth = dobPicker.text
+//            dataPass[0].gender = gender
+//            dataPass[0].image = imageView.image?.pngData()
+//            dataPass[0].age = age
+//            dataPass[0].name = fName.text! + " " + lName.text!
+            dataPass.aboutMe = aboutMe.text
+            delegate.updateRowData(updatedData: dataPass)
+            dismissKeyboard() // To triger textFieldDidEndEditing()
             saveItems()
+            EditViewController.hasDataEntered = true
             self.navigationController?.popViewController(animated: true)
         }
     }
@@ -223,8 +220,6 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         } else {
             let picker = UIImagePickerController()
             picker.sourceType = .camera
-            //for camera front
-            // picker.cameraDevice = .front
             picker.delegate = self
             picker.allowsEditing = false
             present(picker, animated: true)
@@ -239,22 +234,29 @@ class EditViewController: UIViewController, UINavigationControllerDelegate, UIIm
         print("Select image")
     }
 }
-extension EditViewController: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+extension EditViewController: UITextFieldDelegate, UITextViewDelegate {
+    func textFieldDidEndEditing(_ textField: UITextField) {
         performAction(textField.tag)
-        return true
+    }
+    func textViewDidEndEditing(_ textView: UITextView) {
+        print("txtview")
+        performAction(textView.tag)
     }
     func performAction(_ tag: Int) {
+        print(tag)
         switch tag {
         case 0:
-            labelLastName.isHidden = false
-            lName.isHidden = false
-        //lName.becomeFirstResponder()
+            dataPass.fName = fName.text
+            dataPass.name = fName.text! + " " + lName.text!
         case 1:
-            labelDob.isHidden = false
-            dobPicker.isHidden = false
-            //dobPicker.becomeFirstResponder()
-        // all other cases of Unhiding labels and text fields is written inside donedatePicker() function
+            dataPass.lName = lName.text
+            dataPass.name = fName.text! + " " + lName.text!
+        case 2:
+            dataPass.dateofbirth = dobPicker.text
+            donedatePicker()   // to update age
+            dataPass.age = age
+        case 3:
+            dataPass.aboutMe = aboutMe.text
         default: break
         }
     }
